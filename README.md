@@ -1,15 +1,17 @@
 # Laboratorio 04: El Perceptrón Multicapa (MLP) y Backpropagation desde Cero
 
-- **Curso:** SIS070 - Inteligencia Artificial
-- **Unidad:** Unidad II - Aprendizaje Supervisado y Redes Neuronales
-- **Estudiante:** Jhojan Abel Yana Ramos
-- **Repositorio:** https://github.com/Jhojan4a/sis070-lab02-mlp-yana
+* **Curso:** SIS070 - Inteligencia Artificial
+* **Unidad:** Unidad II - Aprendizaje Supervisado y Redes Neuronales
+* **Estudiante:** Jhojan Abel Yana Ramos
+* **Repositorio:** https://github.com/Jhojan4a/sis070-lab02-mlp-yana
 
 ---
 
 ## 1. Descripción y Arquitectura del Modelo
 
 En esta práctica se implementó una red neuronal artificial **Perceptrón Multicapa (MLP)** en Python puro utilizando únicamente la biblioteca **NumPy**, resolviendo el clásico problema no linealmente separable de la compuerta lógica **XOR**.
+
+El objetivo principal es comprender el funcionamiento interno de una red neuronal mediante la implementación desde cero de los procesos de propagación hacia adelante, cálculo de pérdida, retropropagación del error y actualización de pesos mediante descenso de gradiente.
 
 ### Flujo Matemático y Algorítmico
 
@@ -69,10 +71,10 @@ $$
 
 Donde:
 
-- \(W\) representa los pesos.
-- \(b\) representa los sesgos.
-- \(\alpha\) representa la tasa de aprendizaje.
-- \(dW\) y \(db\) representan los gradientes calculados mediante backpropagation.
+* \(W\) representa los pesos.
+* \(b\) representa los sesgos.
+* \(\alpha\) representa la tasa de aprendizaje.
+* \(dW\) y \(db\) representan los gradientes calculados mediante backpropagation.
 
 ---
 
@@ -80,6 +82,7 @@ Donde:
 
 ```text
 sis070-lab02-mlp-yana/
+
 │
 ├── src/
 │   └── mlp_implementation.py
@@ -99,21 +102,63 @@ sis070-lab02-mlp-yana/
 
 ### Actividad 1: Modificación de Hiperparámetros (Learning Rate)
 
-Se evaluó el comportamiento del entrenamiento variando el hiperparámetro **learning_rate** utilizando valores extremos.
+Se evaluó el comportamiento del entrenamiento variando el hiperparámetro **learning_rate** utilizando valores extremos:
+
+* `0.9`
+* `0.0001`
+
+El objetivo fue observar cómo la tasa de aprendizaje afecta la velocidad de reducción de la función de pérdida y el comportamiento final del modelo.
 
 #### Tasa Alta: 0.9
 
-- **Comportamiento:** Las actualizaciones de los pesos realizan saltos excesivamente grandes sobre la superficie de error.
-- **Impacto en Loss:** Puede provocar oscilaciones importantes en el valor de pérdida. En modelos más complejos puede producir inestabilidad o dificultar la convergencia.
+Con `learning_rate = 0.9`, se obtuvieron los siguientes resultados:
+
+```text
+Época    0 | Pérdida (Loss): 0.511851
+Época  400 | Pérdida (Loss): 0.166667
+Época  800 | Pérdida (Loss): 0.166667
+
+Loss final: 0.166667
+```
+
+Predicción:
+
+```text
+[[0.6667]
+ [0.6667]
+ [0.6667]
+ [0.    ]]
+```
+
+La pérdida disminuyó rápidamente durante las primeras épocas y posteriormente permaneció prácticamente constante alrededor de `0.166667`.
+
+En esta ejecución no se observó una divergencia numérica de la pérdida. Sin embargo, el modelo quedó estancado en una solución que no permitió reproducir correctamente las cuatro salidas esperadas del problema XOR.
 
 #### Tasa Baja: 0.0001
 
-- **Comportamiento:** La magnitud de las actualizaciones realizadas durante cada época es muy pequeña.
-- **Impacto en Loss:** En 1000 épocas, la función de costo presenta una reducción muy lenta, por lo que el modelo puede no alcanzar una solución adecuada para el problema XOR dentro del número de épocas establecido.
+Con `learning_rate = 0.0001`, se obtuvieron los siguientes resultados:
 
-#### Conclusión
+```text
+Época    0 | Pérdida (Loss): 0.511851
+Época  400 | Pérdida (Loss): 0.491092
+Época  800 | Pérdida (Loss): 0.472000
 
-Para este experimento, valores intermedios entre **0.05 y 0.1** proporcionan un equilibrio adecuado entre velocidad de aprendizaje y estabilidad durante el entrenamiento.
+Loss final: 0.463035
+```
+
+En este caso, la disminución de la pérdida fue considerablemente más lenta.
+
+Después de 1000 épocas, la pérdida final fue `0.463035`, por lo que el modelo no tuvo suficiente velocidad de aprendizaje para alcanzar una solución adecuada para XOR dentro del número de épocas utilizado.
+
+#### Conclusión de la Actividad 1
+
+Los resultados muestran que la tasa de aprendizaje tiene una influencia directa sobre la velocidad de actualización de los parámetros.
+
+Con `learning_rate = 0.9`, la pérdida disminuyó rápidamente, pero posteriormente se produjo un estancamiento en una solución que no resolvió completamente XOR.
+
+Con `learning_rate = 0.0001`, las actualizaciones fueron mucho más pequeñas y la reducción de la pérdida fue lenta.
+
+Por lo tanto, la tasa de aprendizaje debe seleccionarse considerando tanto la velocidad de aprendizaje como la capacidad del modelo para alcanzar una solución adecuada.
 
 ---
 
@@ -121,9 +166,7 @@ Para este experimento, valores intermedios entre **0.05 y 0.1** proporcionan un 
 
 Se sustituyó la función de activación **ReLU** por la función **Sigmoide**, implementando también su derivada analítica.
 
-#### Comparativa de Convergencia
-
-**ReLU:**
+#### ReLU
 
 La función ReLU se define como:
 
@@ -141,13 +184,36 @@ ReLU'(z)=
 \end{cases}
 $$
 
-En las zonas donde \(z>0\), el gradiente puede propagarse directamente, permitiendo realizar actualizaciones eficientes durante el entrenamiento.
+En el experimento base se utilizó:
 
-En el experimento realizado, la red logró resolver el problema XOR en menos de **800 épocas**.
+```text
+learning_rate = 0.1
+```
 
-**Sigmoide:**
+Los resultados fueron:
 
-La función sigmoide se define como:
+```text
+Época    0 | Pérdida (Loss): 0.511851
+Época  200 | Pérdida (Loss): 0.248587
+Época  400 | Pérdida (Loss): 0.220127
+Época  600 | Pérdida (Loss): 0.169911
+Época  800 | Pérdida (Loss): 0.166680
+```
+
+Predicciones finales:
+
+```text
+[[0.6667]
+ [0.6667]
+ [0.6667]
+ [0.    ]]
+```
+
+Por lo tanto, bajo esta configuración, la red logró reducir progresivamente la pérdida, pero no consiguió reproducir exactamente el patrón XOR.
+
+#### Sigmoide
+
+La función Sigmoide se define como:
 
 $$
 \sigma(z)=\frac{1}{1+e^{-z}}
@@ -159,9 +225,42 @@ $$
 \sigma'(z)=\sigma(z)(1-\sigma(z))
 $$
 
-Su valor máximo de derivada es 0.25 y disminuye cuando la activación se aproxima a 0 o 1.
+Su valor máximo de derivada es `0.25` y disminuye cuando la activación se aproxima a 0 o 1.
 
-En el experimento realizado, la utilización de Sigmoide requirió aproximadamente entre **1500 y 2000 épocas** para alcanzar una estabilización comparable.
+En el experimento realizado se utilizó la función Sigmoide durante 2000 épocas.
+
+Los resultados fueron:
+
+```text
+Época    0 | Pérdida (Loss): 0.871317
+Época  400 | Pérdida (Loss): 0.249647
+Época  800 | Pérdida (Loss): 0.249314
+Época 1200 | Pérdida (Loss): 0.248983
+Época 1600 | Pérdida (Loss): 0.248528
+```
+
+Predicciones finales:
+
+```text
+[[0.4648]
+ [0.5054]
+ [0.5017]
+ [0.5312]]
+```
+
+La pérdida disminuyó desde `0.871317` hasta aproximadamente `0.248528`. Sin embargo, las predicciones permanecieron cercanas a `0.5`, por lo que la red no logró aprender correctamente el patrón XOR bajo esta configuración.
+
+#### Comparación ReLU vs. Sigmoide
+
+Los experimentos permiten observar diferencias en el proceso de entrenamiento.
+
+Con ReLU, la pérdida disminuyó desde `0.511851` hasta aproximadamente `0.166680`, aunque el modelo no consiguió resolver completamente XOR.
+
+Con Sigmoide, la pérdida disminuyó desde `0.871317` hasta aproximadamente `0.248528`, pero las predicciones finales permanecieron cercanas a `0.5`.
+
+Por lo tanto, en las configuraciones utilizadas en este laboratorio, ninguna de las dos configuraciones de la red simple consiguió resolver completamente XOR.
+
+Esto demuestra que el comportamiento de la red depende no solamente de la función de activación, sino también de la arquitectura, los hiperparámetros y la configuración utilizada durante el entrenamiento.
 
 ---
 
@@ -171,19 +270,19 @@ Se implementó la clase **DeepMLP4Layers** utilizando la siguiente arquitectura:
 
 ```text
 Entrada
-  2 neuronas
-      │
-      ▼
+2 neuronas
+    │
+    ▼
 Capa Oculta 1
-  4 neuronas
-      │
-      ▼
+4 neuronas
+    │
+    ▼
 Capa Oculta 2
-  4 neuronas
-      │
-      ▼
+4 neuronas
+    │
+    ▼
 Capa de Salida
-  1 neurona
+1 neurona
 ```
 
 La arquitectura puede representarse de forma resumida como:
@@ -191,6 +290,29 @@ La arquitectura puede representarse de forma resumida como:
 ```text
 Entrada (2) → Oculta 1 (4) → Oculta 2 (4) → Salida (1)
 ```
+
+#### Resultados del entrenamiento
+
+La red de cuatro capas obtuvo los siguientes resultados:
+
+```text
+Época    0 | Pérdida (Loss): 0.545536
+Época  400 | Pérdida (Loss): 0.080454
+Época  800 | Pérdida (Loss): 0.000047
+Época 1200 | Pérdida (Loss): 0.000000
+Época 1600 | Pérdida (Loss): 0.000000
+```
+
+Predicción final:
+
+```text
+[[0.]
+ [1.]
+ [1.]
+ [0.]]
+```
+
+Estas predicciones coinciden exactamente con las salidas esperadas del problema XOR.
 
 #### Cálculo de Gradientes en Cascada
 
@@ -216,7 +338,9 @@ error1 = np.dot(error2, W2.T) * relu_derivative(Z1)
 
 Este procedimiento permite que el error calculado en la salida sea propagado progresivamente hacia las capas anteriores, permitiendo actualizar todos los pesos y sesgos de la red.
 
-La red de mayor profundidad permite realizar una transformación progresiva de los datos mediante diferentes representaciones internas.
+La incorporación de una segunda capa oculta permitió realizar transformaciones adicionales sobre las representaciones internas de los datos.
+
+En este experimento, la arquitectura ampliada consiguió reducir la pérdida prácticamente hasta cero y reproducir correctamente las cuatro salidas de XOR.
 
 ---
 
@@ -232,13 +356,14 @@ Implementa una red neuronal multicapa básica para resolver el problema XOR.
 
 Sus principales procesos son:
 
-- Inicialización de pesos.
-- Propagación hacia adelante.
-- Función de activación.
-- Cálculo de pérdida.
-- Retropropagación.
-- Actualización de pesos mediante descenso de gradiente.
-- Predicción de resultados.
+* Inicialización de pesos.
+* Propagación hacia adelante.
+* Función de activación.
+* Cálculo de pérdida.
+* Retropropagación.
+* Cálculo de gradientes.
+* Actualización de pesos mediante descenso de gradiente.
+* Predicción de resultados.
 
 ### DeepMLP4Layers
 
@@ -257,25 +382,25 @@ Esta versión permite analizar el comportamiento del algoritmo de backpropagatio
 El conjunto de datos utilizado corresponde a la compuerta lógica XOR:
 
 | Entrada X1 | Entrada X2 | Salida esperada |
-|------------|------------|-----------------|
-| 0 | 0 | 0 |
-| 0 | 1 | 1 |
-| 1 | 0 | 1 |
-| 1 | 1 | 0 |
+| ---------- | ---------- | --------------- |
+| 0          | 0          | 0               |
+| 0          | 1          | 1               |
+| 1          | 0          | 1               |
+| 1          | 1          | 0               |
 
 El problema XOR no puede ser separado correctamente mediante una única frontera lineal.
 
-Por esta razón, se requiere una arquitectura con capas ocultas y funciones de activación no lineales.
+Por esta razón, se requiere una arquitectura con capas ocultas y funciones de activación no lineales para representar correctamente la relación entre las entradas y la salida.
 
 ---
 
 ## 6. Tecnologías Utilizadas
 
-- **Python 3**
-- **NumPy**
-- **Git**
-- **GitHub**
-- **Visual Studio Code**
+* **Python 3**
+* **NumPy**
+* **Git**
+* **GitHub**
+* **Visual Studio Code**
 
 No se utilizaron frameworks de Deep Learning para la implementación principal.
 
@@ -315,30 +440,61 @@ La implementación permite observar el proceso de aprendizaje de la red neuronal
 
 Los experimentos realizados permitieron analizar:
 
-- El efecto de diferentes tasas de aprendizaje.
-- La diferencia entre las funciones de activación ReLU y Sigmoide.
-- El comportamiento de una arquitectura neuronal más profunda.
-- El proceso de propagación hacia adelante.
-- El proceso de retropropagación.
-- La actualización de pesos mediante descenso de gradiente.
+* El efecto de diferentes tasas de aprendizaje.
+* La diferencia entre las funciones de activación ReLU y Sigmoide.
+* El comportamiento de una arquitectura neuronal más profunda.
+* El proceso de propagación hacia adelante.
+* El proceso de retropropagación.
+* El cálculo y propagación de gradientes.
+* La actualización de pesos mediante descenso de gradiente.
 
-La red consigue aprender el comportamiento de la compuerta XOR mediante la combinación de capas ocultas, funciones de activación no lineales y el algoritmo de backpropagation.
+### Resumen de resultados
+
+| Experimento       | Loss final aproximado | Resultado                     |
+| ----------------- | --------------------: | ----------------------------- |
+| ReLU, `lr=0.1`    |            `0.166680` | No resuelve completamente XOR |
+| ReLU, `lr=0.9`    |            `0.166667` | No resuelve completamente XOR |
+| ReLU, `lr=0.0001` |            `0.463035` | Aprendizaje muy lento         |
+| Sigmoide          |            `0.248528` | No resuelve XOR               |
+| MLP 4 capas       |            `0.000000` | Resuelve XOR correctamente    |
+
+El resultado más favorable obtenido en los experimentos corresponde a la arquitectura de cuatro capas:
+
+```text
+2 → 4 → 4 → 1
+```
+
+que produjo las predicciones:
+
+```text
+[0, 1, 1, 0]
+```
+
+coincidiendo con las salidas esperadas del problema XOR.
 
 ---
 
 ## 9. Conclusiones
 
-1. El Perceptrón Multicapa permite resolver problemas que no son linealmente separables, como XOR.
+1. El Perceptrón Multicapa permite resolver problemas que presentan relaciones no lineales como el problema XOR.
 
-2. La tasa de aprendizaje tiene una influencia directa sobre la velocidad y estabilidad del proceso de entrenamiento.
+2. La tasa de aprendizaje tiene una influencia directa sobre la velocidad y el comportamiento del proceso de entrenamiento.
 
-3. Una tasa de aprendizaje demasiado elevada puede producir oscilaciones, mientras que una tasa demasiado baja puede hacer que el aprendizaje sea excesivamente lento.
+3. Una tasa de aprendizaje demasiado baja puede hacer que el aprendizaje sea excesivamente lento.
 
-4. La función de activación utilizada influye directamente en la propagación del gradiente y en la velocidad de convergencia.
+4. Una tasa de aprendizaje elevada puede producir una reducción rápida de la pérdida, pero no garantiza que el modelo encuentre una solución adecuada.
 
-5. La implementación de backpropagation desde cero permite comprender el funcionamiento interno del entrenamiento de las redes neuronales.
+5. La función de activación utilizada influye directamente en la propagación del gradiente y en el comportamiento de la convergencia.
 
-6. La incorporación de capas ocultas adicionales permite realizar transformaciones progresivas de los datos y estudiar el comportamiento de redes con mayor profundidad.
+6. En el experimento realizado, la red simple con ReLU no consiguió resolver completamente XOR, aunque logró reducir progresivamente la función de pérdida.
+
+7. En el experimento con Sigmoide, la pérdida disminuyó, pero las predicciones permanecieron cercanas a `0.5`, por lo que tampoco se resolvió correctamente XOR bajo esta configuración.
+
+8. La incorporación de una segunda capa oculta mediante la arquitectura `2 → 4 → 4 → 1` permitió obtener una pérdida prácticamente igual a cero y las predicciones correctas `[0, 1, 1, 0]`.
+
+9. La implementación de backpropagation desde cero permite comprender cómo se calculan y propagan los gradientes a través de las diferentes capas de una red neuronal.
+
+10. Los experimentos permitieron comprobar que la arquitectura, la función de activación, la tasa de aprendizaje y el número de épocas influyen conjuntamente en el proceso de aprendizaje de una red neuronal.
 
 ---
 
