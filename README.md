@@ -9,9 +9,11 @@
 
 ## 1. Descripción y Arquitectura del Modelo
 
-En esta práctica se implementó una red neuronal artificial **Perceptrón Multicapa (MLP)** en Python puro utilizando únicamente la biblioteca **NumPy**, resolviendo el clásico problema no linealmente separable de la compuerta lógica **XOR**.
+En esta práctica se implementó una red neuronal artificial **Perceptrón Multicapa (MLP)** utilizando Python y la biblioteca **NumPy**, sin utilizar frameworks especializados de Deep Learning como TensorFlow o PyTorch.
 
 El objetivo principal es comprender el funcionamiento interno de una red neuronal mediante la implementación desde cero de los procesos de propagación hacia adelante, cálculo de pérdida, retropropagación del error y actualización de pesos mediante descenso de gradiente.
+
+El problema utilizado para evaluar la red neuronal es la compuerta lógica **XOR**, que representa un problema no linealmente separable.
 
 ### Flujo Matemático y Algorítmico
 
@@ -29,14 +31,14 @@ $$
 A^{[l]} = g(Z^{[l]})
 $$
 
-La función de activación permite que la red pueda aprender relaciones no lineales y resolver problemas como XOR.
+La función de activación permite introducir no linealidad en la red y posibilita el aprendizaje de relaciones más complejas entre las entradas y las salidas.
 
 #### 2. Función de Pérdida (Loss Function)
 
 Se emplea el **Error Cuadrático Medio (MSE)**:
 
 $$
-Loss = \frac{1}{m}\sum_{i=1}^{m}(A^{[L]}_i-y_i)^2
+Loss = \frac{1}{m}\sum_{i=1}^{m}(A_i^{[L]}-y_i)^2
 $$
 
 Esta función permite medir la diferencia entre las predicciones realizadas por la red y los valores reales esperados.
@@ -82,7 +84,6 @@ Donde:
 
 ```text
 sis070-lab02-mlp-yana/
-
 │
 ├── src/
 │   └── mlp_implementation.py
@@ -146,9 +147,18 @@ Con `learning_rate = 0.0001`, se obtuvieron los siguientes resultados:
 Loss final: 0.463035
 ```
 
+Predicciones finales:
+
+```text
+[[0.0486]
+ [0.0392]
+ [0.0378]
+ [0.0293]]
+```
+
 En este caso, la disminución de la pérdida fue considerablemente más lenta.
 
-Después de 1000 épocas, la pérdida final fue `0.463035`, por lo que el modelo no tuvo suficiente velocidad de aprendizaje para alcanzar una solución adecuada para XOR dentro del número de épocas utilizado.
+Después de las épocas utilizadas en el experimento, la pérdida final fue `0.463035`, por lo que el modelo no tuvo suficiente velocidad de aprendizaje para alcanzar una solución adecuada para XOR dentro del número de épocas utilizado.
 
 #### Conclusión de la Actividad 1
 
@@ -179,8 +189,8 @@ Su derivada es:
 $$
 ReLU'(z)=
 \begin{cases}
-1 & \text{si } z>0\\
-0 & \text{si } z\leq0
+1, & z > 0 \\
+0, & z \leq 0
 \end{cases}
 $$
 
@@ -381,12 +391,12 @@ Esta versión permite analizar el comportamiento del algoritmo de backpropagatio
 
 El conjunto de datos utilizado corresponde a la compuerta lógica XOR:
 
-| Entrada X1 | Entrada X2 | Salida esperada |
-| ---------- | ---------- | --------------- |
-| 0          | 0          | 0               |
-| 0          | 1          | 1               |
-| 1          | 0          | 1               |
-| 1          | 1          | 0               |
+| **Entrada X1** | **Entrada X2** | **Salida esperada** |
+| -------------- | -------------- | ------------------- |
+| 0              | 0              | 0                   |
+| 0              | 1              | 1                   |
+| 1              | 0              | 1                   |
+| 1              | 1              | 0                   |
 
 El problema XOR no puede ser separado correctamente mediante una única frontera lineal.
 
@@ -450,15 +460,15 @@ Los experimentos realizados permitieron analizar:
 
 ### Resumen de resultados
 
-| Experimento       | Loss final aproximado | Resultado                     |
-| ----------------- | --------------------: | ----------------------------- |
-| ReLU, `lr=0.1`    |            `0.166680` | No resuelve completamente XOR |
-| ReLU, `lr=0.9`    |            `0.166667` | No resuelve completamente XOR |
-| ReLU, `lr=0.0001` |            `0.463035` | Aprendizaje muy lento         |
-| Sigmoide          |            `0.248528` | No resuelve XOR               |
-| MLP 4 capas       |            `0.000000` | Resuelve XOR correctamente    |
+| **Experimento**   | **Loss final aproximado** | **Resultado**                 |
+| ----------------- | ------------------------: | ----------------------------- |
+| ReLU, `lr=0.1`    |                `0.166680` | No resuelve completamente XOR |
+| ReLU, `lr=0.9`    |                `0.166667` | No resuelve completamente XOR |
+| ReLU, `lr=0.0001` |                `0.463035` | Aprendizaje muy lento         |
+| Sigmoide          |                `0.248528` | No resuelve XOR               |
+| MLP 4 capas       |                `0.000000` | Resuelve XOR correctamente    |
 
-El resultado más favorable obtenido en los experimentos corresponde a la arquitectura de cuatro capas:
+El resultado obtenido con la arquitectura de cuatro capas fue:
 
 ```text
 2 → 4 → 4 → 1
@@ -470,30 +480,21 @@ que produjo las predicciones:
 [0, 1, 1, 0]
 ```
 
-coincidiendo con las salidas esperadas del problema XOR.
+Estas predicciones coinciden con las salidas esperadas del problema XOR.
 
 ---
 
 ## 9. Conclusiones
 
 1. El Perceptrón Multicapa permite resolver problemas que presentan relaciones no lineales como el problema XOR.
-
 2. La tasa de aprendizaje tiene una influencia directa sobre la velocidad y el comportamiento del proceso de entrenamiento.
-
 3. Una tasa de aprendizaje demasiado baja puede hacer que el aprendizaje sea excesivamente lento.
-
 4. Una tasa de aprendizaje elevada puede producir una reducción rápida de la pérdida, pero no garantiza que el modelo encuentre una solución adecuada.
-
 5. La función de activación utilizada influye directamente en la propagación del gradiente y en el comportamiento de la convergencia.
-
 6. En el experimento realizado, la red simple con ReLU no consiguió resolver completamente XOR, aunque logró reducir progresivamente la función de pérdida.
-
 7. En el experimento con Sigmoide, la pérdida disminuyó, pero las predicciones permanecieron cercanas a `0.5`, por lo que tampoco se resolvió correctamente XOR bajo esta configuración.
-
 8. La incorporación de una segunda capa oculta mediante la arquitectura `2 → 4 → 4 → 1` permitió obtener una pérdida prácticamente igual a cero y las predicciones correctas `[0, 1, 1, 0]`.
-
 9. La implementación de backpropagation desde cero permite comprender cómo se calculan y propagan los gradientes a través de las diferentes capas de una red neuronal.
-
 10. Los experimentos permitieron comprobar que la arquitectura, la función de activación, la tasa de aprendizaje y el número de épocas influyen conjuntamente en el proceso de aprendizaje de una red neuronal.
 
 ---
